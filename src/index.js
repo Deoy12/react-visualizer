@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import { VictoryChart, VictoryLine, VictoryPie, VictoryTheme, VictoryAxis } from 'victory';
+import { VictoryChart, VictoryLine, VictoryPie, VictoryAxis } from 'victory';
 
 class Table extends React.Component {
-  state = {counter: 0, numHeads:0, numTails:0, data:new Array()};
+  state = {counter: 0, numHeads: 0, numTails:0, data:[{x: 0, y: 0}, {x:1, y:0.5}]};
   flipCoin=()=>{
     const headProbability = document.getElementById("headProbability").value;
     this.setState({counter:this.state.counter + 1});
@@ -14,25 +14,21 @@ class Table extends React.Component {
     } else {
       this.setState({numTails:this.state.numTails + 1});
     }
-    let proportion = this.state.numHeads/this.state.counter
-    this.state.data[this.state.counter - 1] = [this.state.counter, proportion]
+    if (this.state.counter != 0) {
+      let proportion = this.state.numHeads/this.state.counter;
+      this.state.data.push({x: this.state.counter, y: proportion})
+      console.log(this.state.data)
+    }
   }
 
 
   render() { 
     return <div>
-          <p>
-          <button onClick={() => this.flipCoin()} type="button" class="btn btn-secondary btn-lg btn-block">Flip Coin</button>
-          </p>
         
        
-          <p>
-            <div>Coin has been flipped: <b>{this.state.counter} </b> </div>
-            <div>Number of Heads: <b>{this.state.numHeads}</b> </div>
-            <div>Number of Tails: <b>{this.state.numTails}</b> </div>
-
-          </p>   
+          
           <form>
+            
           <div class="form-group">
             <label for="exampleFormControlSelect1"><b>Head Probability</b></label>
             <select id = "headProbability" class="form-control">
@@ -47,16 +43,27 @@ class Table extends React.Component {
             </select>
          </div>
 
-          </form>
         
+          </form>
+          <div class="text-center">
+         <button onClick={() => this.flipCoin()} type="button"  class="btn btn-secondary btn-lg">Flip Coin</button>
+          </div>
           <div style={{ display: "flex", flexWrap: "wrap" }}>
           <VictoryChart style={{ parent: { maxWidth: "50%" } }}>
                       <VictoryLine 
                       data={this.state.data}
-                      x = {0}
-                      y = {1}
+
                   />
-                   
+                  <VictoryAxis label="Number of Coin Flips" />
+                  <VictoryAxis
+                    dependentAxis
+                    label="Head Percentage"
+                    domain={[0, 1]}
+                    style={{
+                      axisLabel: { padding: 35},
+                      tickLabels: { padding: 5 }
+                    }}
+                  />
                 </VictoryChart>
                 <VictoryChart style={{ parent: { maxWidth: "50%" } }}>
                 <VictoryAxis style={{ 
@@ -66,11 +73,13 @@ class Table extends React.Component {
                       }} />
                 <VictoryPie
                   data={[
-                    { x: "Heads", y: this.state.numHeads/this.state.counter},
-                    { x: "Tails", y: 1 - this.state.numHeads/this.state.counter},
+                   
+                    { x: "Heads", y:  (this.state.counter == 0) ? 0.5 : this.state.numHeads/this.state.counter},
+                    { x: "Tails", y:(this.state.counter == 0) ? 0.5 : 1 - this.state.numHeads/this.state.counter},
                   ]}/> 
                 </VictoryChart>
-         </div>         
+         </div>       
+
          </div>
    
   }
